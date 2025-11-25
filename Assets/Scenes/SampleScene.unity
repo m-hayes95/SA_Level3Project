@@ -1721,7 +1721,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5.971248, y: 5.971248, z: 5.971248}
+  m_LocalScale: {x: 29.44721, y: 29.44721, z: 29.44721}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -5975,17 +5975,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4522997517458321177, guid: 1ceb825133f00da4f93b5ad5177a92bb, type: 3}
-      propertyPath: m_Constraints
-      value: 112
-      objectReference: {fileID: 0}
     - target: {fileID: 6318683144144060093, guid: 1ceb825133f00da4f93b5ad5177a92bb, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 7003229604255964945, guid: 1ceb825133f00da4f93b5ad5177a92bb, type: 3}
-      propertyPath: jumpPower
-      value: 5
+      propertyPath: dashes
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003229604255964945, guid: 1ceb825133f00da4f93b5ad5177a92bb, type: 3}
+      propertyPath: dashPower
+      value: 1000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

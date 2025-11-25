@@ -1,9 +1,6 @@
-using System.Numerics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
-using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -12,23 +9,25 @@ public class Player : MonoBehaviour
     /**
     1. Set up player input controls
     2. Make player move and rotate
-    3.
-    4.
-    5.
+    3. Add dash and cooldown
+    4. Add Attack
+    5. Add Animations
     **/
     
     [FormerlySerializedAs("inputActionMap")] public InputActionAsset inputActionAsset;
 
     private InputAction moveAction;
-    private InputAction lookAction;
     private InputAction jumpAction;
     
     private Rigidbody rigidbody;
     private Vector2 moveInput;
+    [SerializeField]private int dashCount = 0; 
 
     public float moveSpeed;
     public float rotateSpeed;
-    public float jumpPower;
+    public float dashPower;
+    public float dashCooldown = 5;
+    public int dashes = 2;
     
     private void OnEnable()
     {
@@ -43,7 +42,6 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         moveAction = inputActionAsset.FindAction("Move");
-        lookAction = inputActionAsset.FindAction("Look");
         jumpAction = inputActionAsset.FindAction("Jump");
         rigidbody = GetComponent<Rigidbody>();
     }
@@ -51,21 +49,16 @@ public class Player : MonoBehaviour
     private void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>();
-        // jump
-        if (jumpAction.WasPressedThisFrame())
-        {
-            Jump();
-        }
-    }
-
-    private void Jump()
-    {
-        rigidbody.AddForceAtPosition(Vector3.up * jumpPower, Vector3.up, ForceMode.Impulse);
     }
 
     private void FixedUpdate()
     {
         Move();
+        
+        if (jumpAction.WasPressedThisFrame() && dashCount < dashes)
+        { 
+            Dash();
+        }
     }
 
     private void Move()
@@ -77,5 +70,25 @@ public class Player : MonoBehaviour
         {
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.fixedDeltaTime);
         }
+    }
+
+    private void Dash()
+    {
+        // Make sure to adjust Rigidbody Linear Damping to prevent over sliding (3f)
+        dashCount++;
+        rigidbody.AddForceAtPosition(rigidbody.transform.forward * dashPower, rigidbody.position, ForceMode.Force);
+        if (dashCount == dashes)
+        {
+            Invoke(nameof(ResetDash), dashCooldown); 
+            // Otherwise will make dashes reset earlier depending on the frame,
+            // but now has the issue of needing to hit 3 first
+        }
+        
+    }
+
+    private void ResetDash()
+    {
+        Debug.Log("Dash cooldown reset");
+        dashCount = 0;
     }
 }
