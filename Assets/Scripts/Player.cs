@@ -1,5 +1,9 @@
+using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
+using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -12,8 +16,10 @@ public class Player : MonoBehaviour
     3. Add dash and cooldown 1
     4. Add Basic Attack 1
     5. Add Animations 1
-    6. Upgrade Attack to Combo 0
-    7. Refactor 0
+    6. Create Bomb with logic 1
+    7. Throw bomb with player 1
+    8. Upgrade Attack to Combo 0
+    9. Refactor 0
     **/
     
     public InputActionAsset inputActionAsset;
@@ -21,6 +27,7 @@ public class Player : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction attackAction;
+    private InputAction throwBombAction;
     
     private Rigidbody rigidbody;
     private Vector2 moveInput;
@@ -42,6 +49,14 @@ public class Player : MonoBehaviour
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
     
+    // Bomb Attack
+    public GameObject bombPrefab;
+    public Transform bombSpawn;
+    public float spawnRate = 4;
+    public float throwStrength;
+    public float bombFriction;
+    private GameObject heldBomb;
+    private bool isHoldingBomb = false;
     
     private void OnEnable()
     {
@@ -58,6 +73,7 @@ public class Player : MonoBehaviour
         moveAction = inputActionAsset.FindAction("Move");
         jumpAction = inputActionAsset.FindAction("Dash");
         attackAction = inputActionAsset.FindAction("Attack");
+        throwBombAction = inputActionAsset.FindAction("ThrowBomb");
         rigidbody = GetComponent<Rigidbody>();
         animator = animationsRef.GetComponent<Animator>();
     }
@@ -65,18 +81,29 @@ public class Player : MonoBehaviour
     private void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>();
-
+        
+        if (throwBombAction.WasPressedThisFrame() )
+        {
+            if (isHoldingBomb)
+            {
+                ThrowBomb();
+            }
+            else
+            {
+                HoldBomb();
+            }
+        }
+        
         if (Time.time >= nextAttackTime)
         {
             if (attackAction.WasPressedThisFrame())
             {
                 nextAttackTime = Time.time + 1f / attackRate;
                 Attack();
-               
             }
         }
     }
-
+    
     private void FixedUpdate()
     {
         Move();
@@ -116,6 +143,35 @@ public class Player : MonoBehaviour
     {
         Debug.Log("Dash cooldown reset");
         dashCount = 0;
+    }
+    
+    private void HoldBomb()
+    {
+        if (heldBomb) return; // If already holding, return 
+        
+        heldBomb = Instantiate(bombPrefab, bombSpawn.position, bombSpawn.rotation, bombSpawn);
+        isHoldingBomb = true;
+        
+        Invoke(nameof(ResetBomb), spawnRate);
+    }
+
+    private void ThrowBomb()
+    {
+        heldBomb.gameObject.AddComponent<Rigidbody>();
+        Rigidbody bombRb = heldBomb.gameObject.GetComponent<Rigidbody>();
+        bombRb.linearDamping = bombFriction;
+        heldBomb.transform.SetParent(null);
+        
+        // Make sure the bomb is facing the correct way before throwing, using the bomb spawn forward direction
+        Vector3 throwDirection = bombSpawn.forward; 
+        bombRb.AddForce(throwDirection * throwStrength, ForceMode.Impulse);
+        
+        isHoldingBomb = false; 
+    }
+
+    private void ResetBomb()
+    {
+        heldBomb = null; // Make sure we can spawn a new bomb
     }
 
     private void Attack()

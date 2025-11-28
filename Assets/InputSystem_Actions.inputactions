@@ -28,7 +28,7 @@
                     "name": "Attack",
                     "type": "Button",
                     "id": "6c2ab1b8-8984-453a-af3d-a3c78ae1679a",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -91,6 +91,15 @@
                     "name": "Dash",
                     "type": "Button",
                     "id": "4e8fc929-ff3b-4859-8fb8-4544f15e0a76",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ThrowBomb",
+                    "type": "Button",
+                    "id": "3f737883-1e9a-4d73-a5bb-961d3ab19853",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -491,6 +500,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5be6818-4793-4719-ad28-05af2719cacf",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThrowBomb",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
