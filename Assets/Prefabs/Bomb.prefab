@@ -123,6 +123,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timer: 3
   damageRadius: 2
+  damage: 50
   damageableLayer:
     serializedVersion: 2
     m_Bits: 64

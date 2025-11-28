@@ -4,6 +4,7 @@ public class Bomb : MonoBehaviour
 {
     public float timer = 3f;
     public float damageRadius = 2f;
+    public float damage;
     public LayerMask damageableLayer;
 
     private void Start()
@@ -24,6 +25,12 @@ public class Bomb : MonoBehaviour
         foreach (Collider obj in hitObjects)
         {
             Debug.Log($"{obj.gameObject.name} was hit by {gameObject.name}");
+            if (obj.gameObject.GetComponent<Enemy>())
+            {
+                // Change to interface
+                obj.gameObject.GetComponent<Enemy>().TakeDamage(damage); 
+            }
+                
             // Add damage
         }
         gameObject.SetActive(false);

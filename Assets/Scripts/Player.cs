@@ -47,6 +47,7 @@ public class Player : MonoBehaviour
     public float attackRange;
     public LayerMask damageableLayer;
     public float attackRate = 2f;
+    public float attackDamage = 40.0f;
     private float nextAttackTime = 0f;
     
     // Bomb Attack
@@ -183,6 +184,10 @@ public class Player : MonoBehaviour
         foreach (Collider enemy in hitEnemies)
         {
             Debug.Log($"{enemy.gameObject.name} was hit");
+            if (enemy.gameObject.GetComponent<Enemy>())
+            {
+                enemy.gameObject.GetComponent<Enemy>().TakeDamage(attackDamage); 
+            }
         }
     }
 
