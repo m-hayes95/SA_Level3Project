@@ -1,20 +1,29 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour
 {
-    public float maxHealth;
-    public float acceptanceRadius;
-    [FormerlySerializedAs("patrolWaitTime"), Range(1f, 5f)] public float maxPatrolWaitTime;
+    [Range(1f, 100f)]public float maxHealth;
+    [Range(1f, 5f)] public float acceptanceRadius;
     
     private float health;
     private NavMeshAgent agent;
     private Vector3 destination;
     private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
     private Vector3 currentTarget;
+
+    private enum EnemyStateMachine
+    {
+        Idle,
+        Patrol,
+        Wait,
+        Chase,
+        Attack,
+        Destroyed
+    };
+    private EnemyStateMachine sM;
     
     private void Awake()
     {
@@ -25,11 +34,22 @@ public class Enemy : MonoBehaviour
     {
         health = maxHealth;
         UpdatePatrolTarget();
+        sM = EnemyStateMachine.Patrol;
     }
 
     private void Update()
     {
-        Patrol();
+        switch (sM)
+        {
+            case EnemyStateMachine.Patrol:
+                Patrol();
+                break;
+            case EnemyStateMachine.Chase:
+                break;
+            default:
+                break;
+            
+        }
     }
     
     public void TakeDamage(float amount)
