@@ -7,12 +7,14 @@ public class Enemy : MonoBehaviour
 {
     [Range(1f, 100f)]public float maxHealth;
     [Range(1f, 5f)] public float acceptanceRadius;
+    [Range(1f, 20f)] public float sightRange;
     
     private float health;
     private NavMeshAgent agent;
     private Vector3 destination;
     private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
     private Vector3 currentTarget;
+    [SerializeField]private Player player;
 
     private enum EnemyStateMachine
     {
@@ -23,7 +25,7 @@ public class Enemy : MonoBehaviour
         Attack,
         Destroyed
     };
-    private EnemyStateMachine sM;
+    [SerializeField]private EnemyStateMachine sM;
     
     private void Awake()
     {
@@ -35,16 +37,39 @@ public class Enemy : MonoBehaviour
         health = maxHealth;
         UpdatePatrolTarget();
         sM = EnemyStateMachine.Patrol;
+        //player = FindFirstObjectByType<Player>();
     }
 
     private void Update()
     {
+        Debug.Log($"Is player in sight {IsPlayerInSight()}");
         switch (sM)
         {
             case EnemyStateMachine.Patrol:
+                
+                if (IsPlayerInSight())
+                {
+                    sM = EnemyStateMachine.Chase;
+                }
+                
                 Patrol();
+                
                 break;
             case EnemyStateMachine.Chase:
+                
+                if (!IsPlayerInSight())
+                {
+                    sM = EnemyStateMachine.Wait;
+                }
+                
+                ChaseTarget();
+                
+                break;
+            case EnemyStateMachine.Wait:
+                
+                Wait();
+                sM = EnemyStateMachine.Patrol;
+                
                 break;
             default:
                 break;
@@ -63,11 +88,17 @@ public class Enemy : MonoBehaviour
             this.enabled = false;
         }
     }
+    
 
     private void Patrol()
     {
         if (Vector3.Distance(transform.position, currentTarget) <= acceptanceRadius)
             UpdatePatrolTarget();
+    }
+
+    private void Wait()
+    {
+        UpdatePatrolTarget(); // when switching to patrol again the target is not updated as we are not at the target point
     }
 
     private void UpdatePatrolTarget()
@@ -84,9 +115,20 @@ public class Enemy : MonoBehaviour
             ? hit.position : transform.position;
     }
 
+    private void ChaseTarget()
+    {
+        agent.SetDestination(player.transform.position);
+    }
+
+    private bool IsPlayerInSight()
+    {
+        return Vector3.Distance(transform.position, player.transform.position) <= sightRange;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(currentTarget, 0.5f);
+        Gizmos.DrawWireSphere(transform.position, sightRange);
     }
 }
