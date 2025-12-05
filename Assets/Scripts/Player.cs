@@ -62,6 +62,7 @@ public class Player : MonoBehaviour
     private bool isHoldingBomb = false;
     
     // Health
+    public bool canDamage = true;
     public float maxHealth = 100.0f;
     [SerializeField] private float hp;
     
@@ -128,6 +129,8 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (!canDamage) return;
+        
         hp -= amount;
         if (hp <= 0)
         {

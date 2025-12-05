@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour
     private Vector3 destination;
     private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
     private Vector3 currentTarget;
-    [SerializeField]private Player player;
+    private Player player;
     private bool canAttack = true;
 
     private enum EnemyStateMachine
@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour
         health = maxHealth;
         UpdatePatrolTarget();
         sM = EnemyStateMachine.Patrol;
-        //player = FindFirstObjectByType<Player>();
+        player = (Player)FindFirstObjectByType(typeof(Player));
     }
 
     private void Update()
