@@ -2,6 +2,7 @@ using System.Numerics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
@@ -32,8 +33,9 @@ public class Player : MonoBehaviour
     private Rigidbody rigidbody;
     private Vector2 moveInput;
     
+    // Movement
     [SerializeField]private int dashCount = 0; 
-
+    
     public float moveSpeed;
     public float rotateSpeed;
     public float dashPower;
@@ -59,6 +61,10 @@ public class Player : MonoBehaviour
     private GameObject heldBomb;
     private bool isHoldingBomb = false;
     
+    // Health
+    public float maxHealth = 100.0f;
+    [SerializeField] private float hp;
+    
     private void OnEnable()
     {
         inputActionAsset.FindActionMap("Player").Enable();
@@ -77,6 +83,11 @@ public class Player : MonoBehaviour
         throwBombAction = inputActionAsset.FindAction("ThrowBomb");
         rigidbody = GetComponent<Rigidbody>();
         animator = animationsRef.GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        hp = maxHealth;
     }
 
     private void Update()
@@ -113,6 +124,27 @@ public class Player : MonoBehaviour
         { 
             Dash();
         }
+    }
+
+    public void TakeDamage(float amount)
+    {
+        hp -= amount;
+        if (hp <= 0)
+        {
+            Dead();
+        }
+    }
+
+    private void Dead()
+    {
+        this.enabled = false;
+        gameObject.SetActive(false);
+        Invoke(nameof(RestartGame), 1.0f);
+    }
+
+    private void RestartGame() // To do, move to different script
+    {
+        SceneManager.LoadScene(0);
     }
 
     private void Move()

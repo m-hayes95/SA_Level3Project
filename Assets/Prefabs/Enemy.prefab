@@ -117,7 +117,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.57833, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 959645161680210270}
@@ -212,8 +212,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  acceptanceRadius: 3
-  target: {fileID: 0}
+  acceptanceRadius: 1.38
+  attackRadius: 2
+  sightRange: 9.78
+  damage: 10
+  attackRate: 2
+  player: {fileID: 0}
+  sM: 0
 --- !u!195 &1866797282718128457
 NavMeshAgent:
   m_ObjectHideFlags: 0

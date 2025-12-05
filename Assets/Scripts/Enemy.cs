@@ -1,13 +1,18 @@
 using System;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Enemy : MonoBehaviour
 {
     [Range(1f, 100f)]public float maxHealth;
     [Range(1f, 5f)] public float acceptanceRadius;
+    [Range(0f, 3f)] public float attackRadius;
     [Range(1f, 20f)] public float sightRange;
+    [Range(1f, 100f)] public float damage;
+    [Range(0f, 5f)] public float attackRate;
     
     private float health;
     private NavMeshAgent agent;
@@ -15,6 +20,7 @@ public class Enemy : MonoBehaviour
     private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
     private Vector3 currentTarget;
     [SerializeField]private Player player;
+    private bool canAttack = true;
 
     private enum EnemyStateMachine
     {
@@ -61,6 +67,11 @@ public class Enemy : MonoBehaviour
                 {
                     sM = EnemyStateMachine.Wait;
                 }
+
+                if (Vector3.Distance(transform.position, player.transform.position) <= attackRadius)
+                {
+                    sM = EnemyStateMachine.Attack;
+                }
                 
                 ChaseTarget();
                 
@@ -71,6 +82,14 @@ public class Enemy : MonoBehaviour
                 sM = EnemyStateMachine.Patrol;
                 
                 break;
+            
+            case EnemyStateMachine.Attack:
+                // need to improve this as atm the enemy will spam switch states whilst attacking
+                if(canAttack)
+                    Attack();
+                sM = EnemyStateMachine.Wait; 
+                break;
+            
             default:
                 break;
             
@@ -125,10 +144,24 @@ public class Enemy : MonoBehaviour
         return Vector3.Distance(transform.position, player.transform.position) <= sightRange;
     }
 
+    private void Attack()
+    {
+        canAttack = false;
+        player.TakeDamage(damage);
+        Invoke(nameof(ResetAttack), attackRate);
+    }
+
+    private void ResetAttack()
+    {
+        canAttack = true;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(currentTarget, 0.5f);
         Gizmos.DrawWireSphere(transform.position, sightRange);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, attackRadius);
     }
 }
