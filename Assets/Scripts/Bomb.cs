@@ -1,3 +1,4 @@
+using Interfaces;
 using UnityEngine;
 
 public class Bomb : MonoBehaviour
@@ -28,7 +29,7 @@ public class Bomb : MonoBehaviour
             if (obj.gameObject.GetComponent<Enemy>())
             {
                 // Change to interface
-                obj.gameObject.GetComponent<Enemy>().TakeDamage(damage); 
+                obj.gameObject.GetComponent<IDamageable>().Damage(damage); 
             }
                 
             // Add damage

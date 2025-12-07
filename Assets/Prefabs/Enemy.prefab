@@ -217,7 +217,10 @@ MonoBehaviour:
   sightRange: 9.78
   damage: 10
   attackRate: 2
-  player: {fileID: 0}
+  damageLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  health: 0
   sM: 0
 --- !u!195 &1866797282718128457
 NavMeshAgent:

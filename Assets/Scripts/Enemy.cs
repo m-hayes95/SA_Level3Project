@@ -1,11 +1,13 @@
 using System;
+using System.Collections;
 using System.Numerics;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDamageable
 {
     [Range(1f, 100f)]public float maxHealth;
     [Range(1f, 5f)] public float acceptanceRadius;
@@ -13,8 +15,9 @@ public class Enemy : MonoBehaviour
     [Range(1f, 20f)] public float sightRange;
     [Range(1f, 100f)] public float damage;
     [Range(0f, 5f)] public float attackRate;
+    public LayerMask damageLayer;
     
-    private float health;
+    [SerializeField] private float health;
     private NavMeshAgent agent;
     private Vector3 destination;
     private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
@@ -95,10 +98,11 @@ public class Enemy : MonoBehaviour
             
         }
     }
-    
-    public void TakeDamage(float amount)
+
+    public void Damage(float amount)
     {
         health -= amount;
+        Debug.Log($"{name} was damaged by: {amount}");
         if (health <= 0)
         {
             Debug.Log($"{gameObject.name} was defeated");
@@ -147,7 +151,14 @@ public class Enemy : MonoBehaviour
     private void Attack()
     {
         canAttack = false;
-        player.TakeDamage(damage);
+        Collider[] hitActors = Physics.OverlapSphere(transform.position, attackRadius, damageLayer);
+        foreach (Collider hitActor in hitActors)
+        {
+            if (hitActor.GetComponent<IDamageable>() != null && hitActor.gameObject != gameObject)
+            {
+                hitActor.GetComponent<IDamageable>().Damage(damage);
+            }
+        }
         Invoke(nameof(ResetAttack), attackRate);
     }
 

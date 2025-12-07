@@ -1,14 +1,12 @@
 using System.Numerics;
-using Unity.VisualScripting;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
 
     /** Check List
@@ -127,7 +125,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float amount)
+    public void Damage(float amount)
     {
         if (!canDamage) return;
         
@@ -221,7 +219,7 @@ public class Player : MonoBehaviour
             Debug.Log($"{enemy.gameObject.name} was hit");
             if (enemy.gameObject.GetComponent<Enemy>())
             {
-                enemy.gameObject.GetComponent<Enemy>().TakeDamage(attackDamage); 
+                enemy.gameObject.GetComponent<IDamageable>().Damage(attackDamage); 
             }
         }
     }

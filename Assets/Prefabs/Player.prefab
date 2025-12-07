@@ -347,7 +347,7 @@ GameObject:
   - component: {fileID: 7003229604255964945}
   - component: {fileID: 28926883321591901}
   - component: {fileID: 4522997517458321177}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -399,11 +399,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   attackRate: 2
+  attackDamage: 40
   bombPrefab: {fileID: 32018969420822150, guid: cc6f883a183ef9d4eb6be621ca1376a9, type: 3}
   bombSpawn: {fileID: 1564293621705934487}
   spawnRate: 4
   throwStrength: 10
   bombFriction: 1.3
+  canDamage: 1
+  maxHealth: 100
+  hp: 0
 --- !u!136 &28926883321591901
 CapsuleCollider:
   m_ObjectHideFlags: 0
