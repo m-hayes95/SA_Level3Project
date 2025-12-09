@@ -1,0 +1,57 @@
+using Interfaces;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class Health : MonoBehaviour, IDamageable
+{
+    public bool canDamage = true;
+    public float maxHealth = 100.0f;
+    [SerializeField] private float hp;
+    
+    private void Start()
+    {
+        hp = maxHealth;
+    }
+    
+    public float GetHealth()
+    {
+        return hp;
+    }
+
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
+    
+    public void AddHealth(float amount)
+    {
+        hp += amount;
+        if (hp > maxHealth)
+        {
+            hp = maxHealth;
+        }
+    }
+    
+    public void Damage(float amount)
+    {
+        if (!canDamage) return;
+        
+        hp -= amount;
+        if (hp <= 0)
+        {
+            Dead();
+        }
+    }
+    
+    private void Dead()
+    {
+        this.enabled = false;
+        gameObject.SetActive(false);
+        Invoke(nameof(RestartGame), 1.0f); // change to event
+    }
+    
+    private void RestartGame() // To do, move to different script
+    {
+        SceneManager.LoadScene(0);
+    }
+}

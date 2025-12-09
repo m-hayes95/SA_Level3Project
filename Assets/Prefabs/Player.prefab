@@ -376,6 +376,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1234218195909106291}
+  - component: {fileID: 6752363795517809512}
   - component: {fileID: 7003229604255964945}
   - component: {fileID: 8338610600779732856}
   - component: {fileID: 28926883321591901}
@@ -406,6 +407,21 @@ Transform:
   - {fileID: 1564293621705934487}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6752363795517809512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6318683144144060093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99cd1b9affab53b4284a0280337d6069, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canDamage: 1
+  maxHealth: 100
+  hp: 0
 --- !u!114 &7003229604255964945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,9 +461,6 @@ MonoBehaviour:
   spawnRate: 4
   throwStrength: 10
   bombFriction: 1.3
-  canDamage: 0
-  maxHealth: 100
-  hp: 0
 --- !u!114 &8338610600779732856
 MonoBehaviour:
   m_ObjectHideFlags: 0

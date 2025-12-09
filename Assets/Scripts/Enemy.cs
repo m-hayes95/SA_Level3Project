@@ -15,7 +15,10 @@ public class Enemy : MonoBehaviour, IDamageable
     [Range(1f, 20f)] public float sightRange;
     [Range(1f, 100f)] public float damage;
     [Range(0f, 5f)] public float attackRate;
+    [Tooltip("Chance to spawn potions after destroyed (0 = always spawn, 5 = 1/6 chance)"),Range(0f, 5f)] 
+    public int potionSpawnChance;
     public LayerMask damageLayer;
+    public GameObject potion;
     
     [SerializeField] private float health;
     private NavMeshAgent agent;
@@ -24,6 +27,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private Vector3 currentTarget;
     private Player player;
     private bool canAttack = true;
+    private bool isDead = false;
 
     private enum EnemyStateMachine
     {
@@ -93,6 +97,11 @@ public class Enemy : MonoBehaviour, IDamageable
                 sM = EnemyStateMachine.Wait; 
                 break;
             
+            case EnemyStateMachine.Destroyed:
+                if (!isDead)
+                    Death();
+                break;
+            
             default:
                 break;
             
@@ -105,13 +114,28 @@ public class Enemy : MonoBehaviour, IDamageable
         Debug.Log($"{name} was damaged by: {amount}");
         if (health <= 0)
         {
-            Debug.Log($"{gameObject.name} was defeated");
-            // Play animation and sound
-            gameObject.SetActive(false); // Remove
-            this.enabled = false;
+            sM = EnemyStateMachine.Destroyed; 
         }
     }
-    
+
+    private void Death()
+    {
+        isDead = true; // Do once
+        ChanceToSpawnPotion();
+        Debug.Log($"{gameObject.name} was defeated");
+        // Play animation and sound
+        gameObject.SetActive(false); // Remove
+        this.enabled = false;
+    }
+
+    private void ChanceToSpawnPotion()
+    {
+        int rand = Random.Range(0, potionSpawnChance);
+        if (rand == 0)
+        {
+            Instantiate(potion, transform.position, transform.rotation);
+        }
+    }
 
     private void Patrol()
     {

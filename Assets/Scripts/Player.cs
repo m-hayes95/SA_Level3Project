@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
-public class Player : MonoBehaviour, IDamageable
+public class Player : MonoBehaviour
 {
 
     /** Check List
@@ -54,9 +54,7 @@ public class Player : MonoBehaviour, IDamageable
     private bool isHoldingBomb = false;
     
     // Health
-    public bool canDamage = true;
-    public float maxHealth = 100.0f;
-    [SerializeField] private float hp;
+    
     
     private void OnEnable()
     {
@@ -75,14 +73,8 @@ public class Player : MonoBehaviour, IDamageable
         attackAction = inputActionAsset.FindAction("Attack");
         throwBombAction = inputActionAsset.FindAction("ThrowBomb");
         rigidbody = GetComponent<Rigidbody>();
-        //
     }
-
-    private void Start()
-    {
-        hp = maxHealth;
-    }
-
+    
     private void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>();
@@ -114,28 +106,11 @@ public class Player : MonoBehaviour, IDamageable
         }
     }
 
-    public void Damage(float amount)
-    {
-        if (!canDamage) return;
-        
-        hp -= amount;
-        if (hp <= 0)
-        {
-            Dead();
-        }
-    }
+    
 
-    private void Dead()
-    {
-        this.enabled = false;
-        gameObject.SetActive(false);
-        Invoke(nameof(RestartGame), 1.0f);
-    }
+    
 
-    private void RestartGame() // To do, move to different script
-    {
-        SceneManager.LoadScene(0);
-    }
+    
 
     private void Move()
     {

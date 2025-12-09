@@ -220,6 +220,7 @@ MonoBehaviour:
   damageLayer:
     serializedVersion: 2
     m_Bits: 64
+  potion: {fileID: 1986959514672799319, guid: 4e7852c41d8ff4b4a9139c1f8a3f83af, type: 3}
   health: 0
   sM: 0
 --- !u!195 &1866797282718128457
