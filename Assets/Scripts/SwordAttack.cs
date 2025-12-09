@@ -5,6 +5,8 @@ using UnityEngine;
 public class SwordAttack : MonoBehaviour
 {
     // Sword Attack
+    public GameObject attackingSword;
+    public GameObject sheathedSword;
     private Animator animator;
     public GameObject animationsRef;
     public Transform attackPoint;
@@ -64,6 +66,7 @@ public class SwordAttack : MonoBehaviour
     }
     private void Attack(int comboIndex)
     {
+        SwitchSwords();
         isAttacking = true;
         lastAttackTime = Time.time;
         // To do, make attacks combo - Move to attack script
@@ -89,7 +92,10 @@ public class SwordAttack : MonoBehaviour
     private IEnumerator ResetAttackState()
     {
         yield return new WaitForSeconds(attackCooldown);
+        SwitchSwords();
         isAttacking = false;
+        //Make sword disappear 
+        attackingSword.SetActive(false);
         Debug.Log($"Attack state reset - isAttacking set to false, comboStep: {comboStep}");
         
         // If there is a queued attack already pressed, the bool flag will clear and we will re-enter the combo attack,
@@ -112,6 +118,12 @@ public class SwordAttack : MonoBehaviour
     {
         Debug.Log($"ResetCombo called - comboStep was {comboStep}, resetting to 1. Time since last attack: {Time.time - lastAttackTime}");
         comboStep = 1;
+    }
+
+    private void SwitchSwords()
+    {
+        attackingSword.SetActive(!attackingSword.activeSelf);
+        sheathedSword.SetActive(!sheathedSword.activeSelf);
     }
     
     private void OnDrawGizmosSelected()
