@@ -32,9 +32,11 @@ public class Health : MonoBehaviour, IDamageable
         }
     }
     
-    public void Damage(float amount)
+    public void Damage(GameObject instigator, float amount)
     {
         if (!canDamage) return;
+        // Don't damage if the player caused the damage
+        if (instigator.GetComponent<Player>()) return; 
         
         hp -= amount;
         if (hp <= 0)

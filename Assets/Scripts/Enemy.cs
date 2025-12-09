@@ -108,8 +108,10 @@ public class Enemy : MonoBehaviour, IDamageable
         }
     }
 
-    public void Damage(float amount)
+    public void Damage(GameObject instigator,float amount)
     {
+        if (instigator.GetComponent<Enemy>()) return;
+        
         health -= amount;
         Debug.Log($"{name} was damaged by: {amount}");
         if (health <= 0)
@@ -180,7 +182,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             if (hitActor.GetComponent<IDamageable>() != null && hitActor.gameObject != gameObject)
             {
-                hitActor.GetComponent<IDamageable>().Damage(damage);
+                hitActor.GetComponent<IDamageable>().Damage(gameObject,damage);
             }
         }
         Invoke(nameof(ResetAttack), attackRate);

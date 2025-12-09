@@ -29,7 +29,7 @@ public class Bomb : MonoBehaviour
             if (obj.gameObject.GetComponent<Enemy>())
             {
                 // Change to interface
-                obj.gameObject.GetComponent<IDamageable>().Damage(damage); 
+                obj.gameObject.GetComponent<IDamageable>().Damage(gameObject,damage); 
             }
                 
             // Add damage

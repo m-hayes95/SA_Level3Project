@@ -83,7 +83,7 @@ public class SwordAttack : MonoBehaviour
             Debug.Log($"{enemy.gameObject.name} was hit");
             if (isDamageable != null)
             {
-                isDamageable.Damage(ScaleDamage(comboIndex)); 
+                isDamageable.Damage(this.gameObject,ScaleDamage(comboIndex)); 
             }
         }
         StartCoroutine(ResetAttackState());

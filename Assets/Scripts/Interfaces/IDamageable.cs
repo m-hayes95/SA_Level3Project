@@ -1,7 +1,10 @@
+using UnityEngine;
+
 namespace Interfaces
 {
     public interface IDamageable
     {
-        void Damage(float amount);
+        // Instigator = Who did the damage (used to ignore damage etc.)
+        void Damage(GameObject instigator, float amount);
     }
 }
