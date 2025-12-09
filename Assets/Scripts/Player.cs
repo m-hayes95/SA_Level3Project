@@ -105,13 +105,7 @@ public class Player : MonoBehaviour
             Dash();
         }
     }
-
     
-
-    
-
-    
-
     private void Move()
     {
         Vector3 moveDir =  new Vector3(moveInput.x, 0, moveInput.y);

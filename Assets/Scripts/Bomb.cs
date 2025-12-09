@@ -25,11 +25,11 @@ public class Bomb : MonoBehaviour
         Collider[] hitObjects = Physics.OverlapSphere(transform.position, damageRadius, damageableLayer);
         foreach (Collider obj in hitObjects)
         {
+            IDamageable isDamageable = obj.GetComponent<IDamageable>();
             Debug.Log($"{obj.gameObject.name} was hit by {gameObject.name}");
-            if (obj.gameObject.GetComponent<Enemy>())
+            if (isDamageable != null)
             {
-                // Change to interface
-                obj.gameObject.GetComponent<IDamageable>().Damage(gameObject,damage); 
+                isDamageable.Damage(gameObject,damage);
             }
                 
             // Add damage
@@ -38,7 +38,7 @@ public class Bomb : MonoBehaviour
         this.enabled = false;
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, damageRadius);
