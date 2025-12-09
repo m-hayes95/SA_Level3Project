@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Numerics;
 using Interfaces;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Vector2 = UnityEngine.Vector2;
@@ -30,6 +32,8 @@ public class Player : MonoBehaviour, IDamageable
     
     private Rigidbody rigidbody;
     private Vector2 moveInput;
+
+    public UnityEvent OnAttack;
     
     // Movement
     [SerializeField]private int dashCount = 0; 
@@ -39,16 +43,6 @@ public class Player : MonoBehaviour, IDamageable
     public float dashPower;
     public float dashCooldown = 5;
     public int dashes = 2;
-
-    // Sword Attack
-    private Animator animator;
-    public GameObject animationsRef;
-    public Transform attackPoint;
-    public float attackRange;
-    public LayerMask damageableLayer;
-    public float attackRate = 2f;
-    public float attackDamage = 40.0f;
-    private float nextAttackTime = 0f;
     
     // Bomb Attack
     public GameObject bombPrefab;
@@ -81,7 +75,7 @@ public class Player : MonoBehaviour, IDamageable
         attackAction = inputActionAsset.FindAction("Attack");
         throwBombAction = inputActionAsset.FindAction("ThrowBomb");
         rigidbody = GetComponent<Rigidbody>();
-        animator = animationsRef.GetComponent<Animator>();
+        //
     }
 
     private void Start()
@@ -104,14 +98,9 @@ public class Player : MonoBehaviour, IDamageable
                 HoldBomb();
             }
         }
-        
-        if (Time.time >= nextAttackTime)
+        if (attackAction.WasPressedThisFrame())
         {
-            if (attackAction.WasPressedThisFrame())
-            {
-                nextAttackTime = Time.time + 1f / attackRate;
-                Attack();
-            }
+            OnAttack?.Invoke();
         }
     }
     
@@ -207,26 +196,6 @@ public class Player : MonoBehaviour, IDamageable
     {
         heldBomb = null; // Make sure we can spawn a new bomb
     }
-
-    private void Attack()
-    {
-        // To do, make attacks combo - Move to attack script
-        // Change animations, its jank right now
-        animator.SetTrigger("Attack");
-        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, damageableLayer);
-        foreach (Collider enemy in hitEnemies)
-        {
-            Debug.Log($"{enemy.gameObject.name} was hit");
-            if (enemy.gameObject.GetComponent<Enemy>())
-            {
-                enemy.gameObject.GetComponent<IDamageable>().Damage(attackDamage); 
-            }
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere(attackPoint.position, attackRange);
-    }
+    
+    
 }
