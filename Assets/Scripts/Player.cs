@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     public InputActionAsset inputActionAsset;
 
     private InputAction moveAction;
+    private InputAction interactAction;
     private InputAction jumpAction;
     private InputAction attackAction;
     private InputAction throwBombAction;
@@ -34,9 +35,10 @@ public class Player : MonoBehaviour
     private Vector2 moveInput;
 
     public UnityEvent OnAttack;
+    public UnityEvent OnInteract;
     
     // Movement
-    [SerializeField]private int dashCount = 0; 
+    [SerializeField] private int dashCount = 0; 
     
     public float moveSpeed;
     public float rotateSpeed;
@@ -69,9 +71,11 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         moveAction = inputActionAsset.FindAction("Move");
+        interactAction = inputActionAsset.FindAction("Interact");
         jumpAction = inputActionAsset.FindAction("Dash");
         attackAction = inputActionAsset.FindAction("Attack");
         throwBombAction = inputActionAsset.FindAction("ThrowBomb");
+        
         rigidbody = GetComponent<Rigidbody>();
     }
     
@@ -93,6 +97,11 @@ public class Player : MonoBehaviour
         if (attackAction.WasPressedThisFrame())
         {
             OnAttack?.Invoke();
+        }
+
+        if (interactAction.WasPressedThisFrame())
+        {
+            OnInteract?.Invoke();
         }
     }
     
