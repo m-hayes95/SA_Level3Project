@@ -63,6 +63,7 @@ public class Interact : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        /**
         if (collider == null) collider = GetComponent<Collider>();
         if (collider == null) return;
         
@@ -76,5 +77,6 @@ public class Interact : MonoBehaviour
 
         // Reset matrix
         Gizmos.matrix = Matrix4x4.identity;
+        **/
     }
 }

@@ -533,6 +533,7 @@ MonoBehaviour:
   interactableLayer:
     serializedVersion: 2
     m_Bits: 128
+  maxDistance: 5
 --- !u!136 &28926883321591901
 CapsuleCollider:
   m_ObjectHideFlags: 0
