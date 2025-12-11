@@ -122,6 +122,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d54eb687e63174986b14129fa14d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pulseSize: 1.296
+  pulseTime: 0.5
+  pulseMat: {fileID: 2100000, guid: db4ca4aeb2810164a85a1feab681cf0b, type: 2}
   timer: 3
   damageRadius: 2
   damage: 50

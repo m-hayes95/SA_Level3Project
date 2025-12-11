@@ -1,25 +1,62 @@
+using System.Collections;
 using Interfaces;
 using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
+    [Range(1.0f,2.0f)] public float pulseSize = 1.5f;
+    public float pulseTime = 0.5f;
+    public Material pulseMat;
     public float timer = 3f;
     public float damageRadius = 2f;
     public float damage;
     public LayerMask damageableLayer;
+    // private
+    private Material originalMat;
+    private Renderer rend;
+    private float pulseTimer = 1f;
+    private bool isDone = false;
+    private Vector3 originalScale;
+    private Vector3 pulseScale;
 
+    private void Awake()
+    {
+        rend =  GetComponent<Renderer>();
+    }
     private void Start()
     {
+        originalMat = rend.material;
+        originalScale = transform.localScale;
+        pulseScale = originalScale * pulseSize;
         Invoke(nameof(Explode), timer);
-        
+        StartCoroutine(ChangeColours());
         // Play timer sound 
-        // Play timer animation
+    }
+
+    private IEnumerator ChangeColours()
+    {
+        while (!isDone)
+        {
+            yield return new WaitForSeconds(pulseTimer);
+            Pulse();
+            yield return new WaitForSeconds(pulseTime);
+            Pulse();
+        }
+        yield return null;
+    }
+
+    private void Pulse()
+    {
+        rend.material = rend.material != originalMat ? originalMat : pulseMat;
+
+        transform.localScale = transform.localScale != originalScale? originalScale : pulseScale;
     }
 
     private void Explode()
     {
         // Play sound
         // Activate Effect
+        isDone = true;
         
         Debug.Log("Detonate Bomb");
         Collider[] hitObjects = Physics.OverlapSphere(transform.position, damageRadius, damageableLayer);
