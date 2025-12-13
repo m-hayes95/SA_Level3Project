@@ -10,6 +10,7 @@ public class Health : MonoBehaviour, IDamageable
     public float maxHealth = 100.0f;
     public Animator animator;
     private const string ISDEAD = "IsDead";
+    private const string  HIT = "Hit";
     [SerializeField] private float hp;
     
     private void Start()
@@ -41,7 +42,7 @@ public class Health : MonoBehaviour, IDamageable
         if (!canDamage) return;
         // Don't damage if the player caused the damage
         if (instigator.GetComponent<Player>()) return; 
-        
+        animator.SetTrigger(HIT);
         hp -= amount;
         if (hp <= 0)
         {
@@ -55,7 +56,7 @@ public class Health : MonoBehaviour, IDamageable
         animator.SetBool(ISDEAD, true);
         this.enabled = false;
         //gameObject.SetActive(false);
-        Invoke(nameof(RestartGame), 3.0f); // change to event
+        Invoke(nameof(RestartGame), 1f); // change to event
     }
     
     private void RestartGame() // To do, move to different script
