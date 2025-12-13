@@ -1,11 +1,15 @@
 using Interfaces;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour, IDamageable
 {
+    public UnityEvent OnDeath;
     public bool canDamage = true;
     public float maxHealth = 100.0f;
+    public Animator animator;
+    private const string ISDEAD = "IsDead";
     [SerializeField] private float hp;
     
     private void Start()
@@ -47,9 +51,11 @@ public class Health : MonoBehaviour, IDamageable
     
     private void Dead()
     {
+        OnDeath.Invoke();
+        animator.SetBool(ISDEAD, true);
         this.enabled = false;
-        gameObject.SetActive(false);
-        Invoke(nameof(RestartGame), 1.0f); // change to event
+        //gameObject.SetActive(false);
+        Invoke(nameof(RestartGame), 3.0f); // change to event
     }
     
     private void RestartGame() // To do, move to different script

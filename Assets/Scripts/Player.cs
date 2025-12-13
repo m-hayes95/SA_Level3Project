@@ -46,6 +46,8 @@ public class Player : MonoBehaviour
     public float dashCooldown = 5;
     public int dashes = 2;
     private const string ISRUNNING = "IsRunning";
+    private bool canInput = true;
+    
     // Bomb Attack
     public Animator  animator;
     public GameObject bombPrefab;
@@ -55,6 +57,8 @@ public class Player : MonoBehaviour
     public float bombFriction;
     private GameObject heldBomb;
     private bool isHoldingBomb = false;
+    private const string ISHOLDINGBOMB = "IsHolding";
+    private const string THROW = "Throw";
     
     // Health
     
@@ -79,9 +83,16 @@ public class Player : MonoBehaviour
         
         rigidbody = GetComponent<Rigidbody>();
     }
+
+    private void Start()
+    {
+        canInput = true;
+    }
     
     private void Update()
     {
+        if (!canInput) return;
+        
         moveInput = moveAction.ReadValue<Vector2>();
         
         if (throwBombAction.WasPressedThisFrame() )
@@ -108,6 +119,8 @@ public class Player : MonoBehaviour
     
     private void FixedUpdate()
     {
+        if (!canInput) return;
+        
         Move();
         
         if (jumpAction.WasPressedThisFrame() && dashCount < dashes)
@@ -158,6 +171,7 @@ public class Player : MonoBehaviour
         
         heldBomb = Instantiate(bombPrefab, bombSpawn.position, bombSpawn.rotation, bombSpawn);
         isHoldingBomb = true;
+        animator.SetBool(ISHOLDINGBOMB, true);
         
         Invoke(nameof(ResetBomb), spawnRate);
     }
@@ -172,7 +186,9 @@ public class Player : MonoBehaviour
         // Make sure the bomb is facing the correct way before throwing, using the bomb spawn forward direction
         Vector3 throwDirection = bombSpawn.forward; 
         bombRb.AddForce(throwDirection * throwStrength, ForceMode.Impulse);
-        
+        // Anims
+        animator.SetBool(ISHOLDINGBOMB, false);
+        animator.SetTrigger(THROW);
         isHoldingBomb = false; 
     }
 
@@ -180,6 +196,9 @@ public class Player : MonoBehaviour
     {
         heldBomb = null; // Make sure we can spawn a new bomb
     }
-    
-    
+
+    public void SetCanUsePlayerInput(bool allowInput = false)
+    {
+        canInput = allowInput;
+    }
 }
