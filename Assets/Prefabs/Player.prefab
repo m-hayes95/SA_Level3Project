@@ -71,9 +71,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6525168670380155897}
-  - component: {fileID: 3022265108126320433}
   m_Layer: 0
-  m_Name: Animations
+  m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,28 +95,6 @@ Transform:
   - {fileID: 5931205610783082344}
   m_Father: {fileID: 1234218195909106291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &3022265108126320433
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3899227930634650534}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 202fef30f9832754a818ad974d61baea, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6318683144144060093
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,6 +200,7 @@ MonoBehaviour:
   dashPower: 1000
   dashCooldown: 5
   dashes: 3
+  animator: {fileID: 4562735597408711356}
   bombPrefab: {fileID: 32018969420822150, guid: cc6f883a183ef9d4eb6be621ca1376a9, type: 3}
   bombSpawn: {fileID: 1564293621705934487}
   spawnRate: 4
@@ -242,7 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackingSword: {fileID: 5241510725048747175}
   sheathedSword: {fileID: 6414305338701897170}
-  animationsRef: {fileID: 3899227930634650534}
+  animationsRef: {fileID: 5862467152741667036}
   attackPoint: {fileID: 6124556763055417516}
   attackRange: 0.93
   damageableLayer:
@@ -574,8 +552,38 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d72fc60be92dd444ebd1e1e367173398, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4562735597408711356}
   m_SourcePrefab: {fileID: 100100000, guid: d72fc60be92dd444ebd1e1e367173398, type: 3}
+--- !u!1 &5862467152741667036 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d72fc60be92dd444ebd1e1e367173398, type: 3}
+  m_PrefabInstance: {fileID: 6744917802993134989}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4562735597408711356
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5862467152741667036}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: d72fc60be92dd444ebd1e1e367173398, type: 3}
+  m_Controller: {fileID: 9100000, guid: 202fef30f9832754a818ad974d61baea, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &6489821736171752038 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d72fc60be92dd444ebd1e1e367173398, type: 3}

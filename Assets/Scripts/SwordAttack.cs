@@ -22,11 +22,10 @@ public class SwordAttack : MonoBehaviour
     [SerializeField]private bool isAttacking = false;
     [SerializeField]private int comboStep = 1;
 
-    private void Awake()
+    private void Start()
     {
         animator = animationsRef.GetComponent<Animator>();
     }
-
     private void Update()
     {
         if (lastAttackTime > 0f && !isAttacking && comboStep > 1)

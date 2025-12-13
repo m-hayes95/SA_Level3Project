@@ -45,8 +45,9 @@ public class Player : MonoBehaviour
     public float dashPower;
     public float dashCooldown = 5;
     public int dashes = 2;
-    
+    private const string ISRUNNING = "IsRunning";
     // Bomb Attack
+    public Animator  animator;
     public GameObject bombPrefab;
     public Transform bombSpawn;
     public float spawnRate = 4;
@@ -123,6 +124,11 @@ public class Player : MonoBehaviour
         if (moveDir != Vector3.zero)
         {
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.fixedDeltaTime);
+            animator.SetBool(ISRUNNING, true);
+        }
+        else
+        {
+            animator.SetBool(ISRUNNING, false);
         }
     }
 
