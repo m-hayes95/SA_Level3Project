@@ -194,6 +194,7 @@ public class Player : MonoBehaviour
 
     private void ResetBomb()
     {
+        animator.SetBool(ISHOLDINGBOMB, false);
         heldBomb = null; // Make sure we can spawn a new bomb
     }
 
