@@ -6164,6 +6164,10 @@ PrefabInstance:
       propertyPath: spawnRange
       value: 15.2
       objectReference: {fileID: 0}
+    - target: {fileID: 1607057267021470760, guid: dc3d873353d1fe140bdf9a8e03242fdd, type: 3}
+      propertyPath: allowSpawnPlayerDistance
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 5682937562415046487, guid: dc3d873353d1fe140bdf9a8e03242fdd, type: 3}
       propertyPath: m_Name
       value: Enemy Spawn
@@ -14665,10 +14669,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 658983623}
     m_Modifications:
-    - target: {fileID: 1607057267021470760, guid: dc3d873353d1fe140bdf9a8e03242fdd, type: 3}
-      propertyPath: spawnRange
-      value: 15.8
-      objectReference: {fileID: 0}
     - target: {fileID: 5682937562415046487, guid: dc3d873353d1fe140bdf9a8e03242fdd, type: 3}
       propertyPath: m_Name
       value: Enemy Spawn
