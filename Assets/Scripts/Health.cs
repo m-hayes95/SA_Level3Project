@@ -2,11 +2,12 @@ using Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class Health : MonoBehaviour, IDamageable
 {
     public UnityEvent OnDeath;
-    public UnityEvent OnTakeDamage;
+    public UnityEvent OnHealthChanged;
     public bool canDamage = true;
     public float maxHealth = 100.0f;
     public Animator animator;
@@ -32,6 +33,7 @@ public class Health : MonoBehaviour, IDamageable
     public void AddHealth(float amount)
     {
         hp += amount;
+        OnHealthChanged.Invoke();
         if (hp > maxHealth)
         {
             hp = maxHealth;
@@ -45,7 +47,7 @@ public class Health : MonoBehaviour, IDamageable
         if (instigator.GetComponent<Player>()) return; 
         animator.SetTrigger(HIT);
         hp -= amount;
-        OnTakeDamage?.Invoke();
+        OnHealthChanged?.Invoke();
         if (hp <= 0)
         {
             Dead();
