@@ -17,6 +17,7 @@ public class SwordAttack : MonoBehaviour
     public float comboResetTime = 1.5f;
     public float comboWindowTime = 0.5f;
     public float attackDamage = 20.0f;
+    
     private float lastAttackTime = 0f;
     private bool queuedAttack = false;
     [SerializeField]private bool isAttacking = false;
@@ -82,7 +83,7 @@ public class SwordAttack : MonoBehaviour
             Debug.Log($"{enemy.gameObject.name} was hit");
             if (isDamageable != null)
             {
-                isDamageable.Damage(this.gameObject,ScaleDamage(comboIndex)); 
+                isDamageable.Damage(this.gameObject,ScaleDamage(comboIndex));
             }
         }
         StartCoroutine(ResetAttackState());

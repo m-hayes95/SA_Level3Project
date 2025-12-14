@@ -4,6 +4,7 @@ using System.Numerics;
 using Interfaces;
 using UnityEngine;
 using UnityEngine.AI;
+using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
@@ -19,6 +20,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public int potionSpawnChance;
     public LayerMask damageLayer;
     public GameObject potion;
+    public GameObject deathEffect;
+    public ParticleSystem hitEffect;
     
     [SerializeField] private float health;
     private NavMeshAgent agent;
@@ -111,7 +114,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public void Damage(GameObject instigator,float amount)
     {
         if (instigator.GetComponent<Enemy>()) return;
-        
+        hitEffect.Play();
         health -= amount;
         Debug.Log($"{name} was damaged by: {amount}");
         if (health <= 0)
@@ -123,6 +126,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Death()
     {
         isDead = true; // Do once
+        Instantiate(deathEffect, transform.position, Quaternion.identity);
         ChanceToSpawnPotion();
         Debug.Log($"{gameObject.name} was defeated");
         // Play animation and sound

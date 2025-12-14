@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
     public float dashPower;
     public float dashCooldown = 5;
     public int dashes = 2;
+    public ParticleSystem dashEffect;
     private const string ISRUNNING = "IsRunning";
     private bool canInput = true;
     
@@ -148,8 +149,13 @@ public class Player : MonoBehaviour
     private void Dash()
     {
         // Make sure to adjust Rigidbody Linear Damping to prevent over sliding (3f)
+        
         dashCount++;
         rigidbody.AddForceAtPosition(rigidbody.transform.forward * dashPower, rigidbody.position, ForceMode.Force);
+        // play sound
+        
+        dashEffect.Play();
+        
         if (dashCount == dashes)
         {
             Invoke(nameof(ResetDash), dashCooldown); 
