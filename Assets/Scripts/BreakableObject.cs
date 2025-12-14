@@ -6,6 +6,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
 {
     public bool onlyDamageWithBomb = true;
     public UnityEvent OnDestroyed;
+    public GameObject destroyEffect;
 
     public void Damage(GameObject instigator, float amount)
     {
@@ -24,6 +25,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
 
     private void DestroyThisObject()
     {
+        Instantiate(destroyEffect,  transform.position, Quaternion.identity);
         OnDestroyed?.Invoke(); // Activate other effects
         gameObject.SetActive(false);
     }

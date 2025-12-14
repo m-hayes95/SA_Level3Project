@@ -11,6 +11,7 @@ public class Bomb : MonoBehaviour
     public float damageRadius = 2f;
     public float damage;
     public LayerMask damageableLayer;
+    public GameObject explosionEffect;
     // private
     private Material originalMat;
     private Renderer rend;
@@ -18,6 +19,7 @@ public class Bomb : MonoBehaviour
     private bool isDone = false;
     private Vector3 originalScale;
     private Vector3 pulseScale;
+    
 
     private void Awake()
     {
@@ -55,7 +57,9 @@ public class Bomb : MonoBehaviour
     private void Explode()
     {
         // Play sound
-        // Activate Effect
+        
+        Instantiate(explosionEffect,  transform.position, Quaternion.identity);
+        
         isDone = true;
         
         Debug.Log("Detonate Bomb");
