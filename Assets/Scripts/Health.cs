@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class Health : MonoBehaviour, IDamageable
 {
     public UnityEvent OnDeath;
+    public UnityEvent OnTakeDamage;
     public bool canDamage = true;
     public float maxHealth = 100.0f;
     public Animator animator;
@@ -44,6 +45,7 @@ public class Health : MonoBehaviour, IDamageable
         if (instigator.GetComponent<Player>()) return; 
         animator.SetTrigger(HIT);
         hp -= amount;
+        OnTakeDamage?.Invoke();
         if (hp <= 0)
         {
             Dead();

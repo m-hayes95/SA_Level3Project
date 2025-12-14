@@ -126,6 +126,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Death()
     {
         isDead = true; // Do once
+        player.GetComponent<EnemyDestroyedCounter>().AddToCounter();
         Instantiate(deathEffect, transform.position, Quaternion.identity);
         ChanceToSpawnPotion();
         Debug.Log($"{gameObject.name} was defeated");
