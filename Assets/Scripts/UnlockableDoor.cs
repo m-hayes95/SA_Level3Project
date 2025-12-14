@@ -1,10 +1,13 @@
 using System;
 using Interfaces;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UnlockableDoor : MonoBehaviour, IInteractable
 {
     public Key.KeyType keyType;
+    public UnityEvent OnOpen;
+    
     public void Interact(GameObject instigator)
     {
         TryOpenDoor(instigator);
@@ -22,6 +25,7 @@ public class UnlockableDoor : MonoBehaviour, IInteractable
 
     private void Open()
     {
+        OnOpen?.Invoke();
         gameObject.SetActive(false);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using Interfaces;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SwordAttack : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class SwordAttack : MonoBehaviour
     public float comboResetTime = 1.5f;
     public float comboWindowTime = 0.5f;
     public float attackDamage = 20.0f;
+    public AudioSource attackSound;
     
     private float lastAttackTime = 0f;
     private bool queuedAttack = false;
@@ -69,8 +71,8 @@ public class SwordAttack : MonoBehaviour
         SwitchSwords();
         isAttacking = true;
         lastAttackTime = Time.time;
+        attackSound.Play();
         // To do, make attacks combo - Move to attack script
-        // Change animations, its jank right now
 
         animator.SetTrigger("Attack"); // TODO Change depending on combo index - animator.SetInteger("ComboStep", comboIndex);
         

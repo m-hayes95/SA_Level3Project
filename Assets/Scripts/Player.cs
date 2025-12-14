@@ -48,6 +48,7 @@ public class Player : MonoBehaviour
     public ParticleSystem dashEffect;
     private const string ISRUNNING = "IsRunning";
     private bool canInput = true;
+    public AudioSource dashSound;
     
     // Bomb Attack
     public Animator  animator;
@@ -152,7 +153,7 @@ public class Player : MonoBehaviour
         
         dashCount++;
         rigidbody.AddForceAtPosition(rigidbody.transform.forward * dashPower, rigidbody.position, ForceMode.Force);
-        // play sound
+        dashSound.Play();
         
         dashEffect.Play();
         

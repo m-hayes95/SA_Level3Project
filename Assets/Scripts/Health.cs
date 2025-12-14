@@ -2,6 +2,7 @@ using Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 using UnityEngine.Serialization;
 
 public class Health : MonoBehaviour, IDamageable
@@ -13,6 +14,7 @@ public class Health : MonoBehaviour, IDamageable
     public Animator animator;
     private const string ISDEAD = "IsDead";
     private const string  HIT = "Hit";
+    public AudioSource hitSound;
     [SerializeField] private float hp;
     
     private void Start()
@@ -46,6 +48,7 @@ public class Health : MonoBehaviour, IDamageable
         // Don't damage if the player caused the damage
         if (instigator.GetComponent<Player>()) return; 
         animator.SetTrigger(HIT);
+        hitSound.Play();
         hp -= amount;
         OnHealthChanged?.Invoke();
         if (hp <= 0)
@@ -68,3 +71,5 @@ public class Health : MonoBehaviour, IDamageable
         SceneManager.LoadScene(0);
     }
 }
+
+
