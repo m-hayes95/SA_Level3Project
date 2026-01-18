@@ -11,6 +11,8 @@ public class Spawner : MonoBehaviour
     [Tooltip("How far the player can be from the spawner to allow spawning"), Range(1.0f,500.0f)] 
     public float allowSpawnPlayerDistance = 50.0f;
 
+    public bool enemiesCanSpawn = true;
+
     private Vector3 randSpawnPoint;
     private Vector3 lastSpawnPoint;
     private Vector3 center;
@@ -24,7 +26,7 @@ public class Spawner : MonoBehaviour
     }
     private void Update()
     {
-        if (isSpawning || !CheckCanSpawn()) return;
+        if (isSpawning || !CheckCanSpawn() || !enemiesCanSpawn) return;
         
         StartCoroutine(SpawnNextObject());
     }

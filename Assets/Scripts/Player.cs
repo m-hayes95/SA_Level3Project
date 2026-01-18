@@ -62,7 +62,10 @@ public class Player : MonoBehaviour
     private const string ISHOLDINGBOMB = "IsHolding";
     private const string THROW = "Throw";
     
-    // Health
+    // Animation
+    private float startAnimLayerMask;
+    private float throwAnimLayerMask;
+    public float moveTowardsTime;
     
     
     private void OnEnable()
@@ -106,6 +109,7 @@ public class Player : MonoBehaviour
             else
             {
                 HoldBomb();
+                // could put the holding blending layer here and not use an Enumerator
             }
         }
         if (attackAction.WasPressedThisFrame())
@@ -172,6 +176,25 @@ public class Player : MonoBehaviour
         dashCount = 0;
     }
     
+    private IEnumerator TransitionAnimationLayers(int animationLayer, float targetAnimWeight, float transitionTime)
+    {
+        // Create new layer in animator and blending mask so this layer only affects the hands
+        // Set the weight of the layer to 1 to hold and walk or 0 to remove the layer animation
+        float startTime = Time.time;
+        
+        while (Time.time < startTime + transitionTime)
+        {
+            float currentLayerWeight = animator.GetLayerWeight(animationLayer);
+            float newLayerWeight = 
+                Mathf.MoveTowards(currentLayerWeight, targetAnimWeight, Time.deltaTime * moveTowardsTime);
+            animator.SetLayerWeight(animationLayer, newLayerWeight);
+            Debug.Log($"Biggie Smalls {newLayerWeight}");
+            yield return null;
+        }
+        // Force end position 
+        animator.SetLayerWeight(animationLayer, targetAnimWeight);
+    }
+    
     private void HoldBomb()
     {
         if (heldBomb) return; // If already holding, return 
@@ -179,7 +202,7 @@ public class Player : MonoBehaviour
         heldBomb = Instantiate(bombPrefab, bombSpawn.position, bombSpawn.rotation, bombSpawn);
         isHoldingBomb = true;
         animator.SetBool(ISHOLDINGBOMB, true);
-        
+        StartCoroutine(TransitionAnimationLayers(1, 1f, 1f));
         Invoke(nameof(ResetBomb), spawnRate);
     }
 
@@ -196,12 +219,15 @@ public class Player : MonoBehaviour
         // Anims
         animator.SetBool(ISHOLDINGBOMB, false);
         animator.SetTrigger(THROW);
+        StartCoroutine(TransitionAnimationLayers(1, 0f, .5f));
         isHoldingBomb = false; 
     }
 
     private void ResetBomb()
     {
         animator.SetBool(ISHOLDINGBOMB, false);
+        if(animator.GetLayerWeight(1) != 0f)
+            StartCoroutine(TransitionAnimationLayers(1, 0f, 1f));
         heldBomb = null; // Make sure we can spawn a new bomb
     }
 
