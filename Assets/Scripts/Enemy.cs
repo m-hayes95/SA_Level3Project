@@ -23,6 +23,17 @@ public class Enemy : MonoBehaviour, IDamageable
     public GameObject deathEffect;
     public ParticleSystem hitEffect;
     
+    [Header("Animation")]
+    public Animator animator;
+    
+    private readonly int idleStateHash =  Animator.StringToHash("IsIdle");
+    private readonly int moveStateHash =  Animator.StringToHash("IsMoving");
+    private readonly int chaseStateHash =  Animator.StringToHash("IsChasing");
+    private readonly int deathStateHash =  Animator.StringToHash("Dead");
+    private readonly int attackStateHash =  Animator.StringToHash("Attack");
+    private readonly int hitStateHash =  Animator.StringToHash("Hit");
+    
+    
     [SerializeField] private float health;
     private NavMeshAgent agent;
     private Vector3 destination;
@@ -30,6 +41,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private Vector3 currentTarget;
     private Player player;
     private bool canAttack = true;
+    private bool isChasing = false;
     private bool isDead = false;
 
     private enum EnemyStateMachine
@@ -58,9 +70,16 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        //UpdateMoveAnimation();
+        
         Debug.Log($"Is player in sight {IsPlayerInSight()}");
+        
         switch (sM)
         {
+            case EnemyStateMachine.Idle:
+                Idle();
+                break;
+            
             case EnemyStateMachine.Patrol:
                 
                 if (IsPlayerInSight())
@@ -113,24 +132,63 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void Damage(GameObject instigator,float amount)
     {
+        if (isDead) return; // If is dead and takes damage, they trigger the hit animation
         if (instigator.GetComponent<Enemy>()) return;
         hitEffect.Play();
         health -= amount;
         Debug.Log($"{name} was damaged by: {amount}");
+        animator.SetTrigger(hitStateHash);
         if (health <= 0)
         {
             sM = EnemyStateMachine.Destroyed; 
         }
     }
 
+    private void Idle()
+    {
+        // Check if there is a valid patrol target before moving
+        animator.SetBool(moveStateHash, false);
+    }
+
+    private void UpdateMoveAnimation()
+    {
+        if (agent.velocity.magnitude < 0.1f)
+        {
+            if (isChasing)
+            {
+                animator.SetBool(chaseStateHash, true);
+                animator.SetBool(moveStateHash, false);
+            }
+            else
+            {
+                animator.SetBool(moveStateHash, true);
+                animator.SetBool(chaseStateHash, false);
+            }
+            
+        }
+        else
+        {
+            animator.SetBool(idleStateHash, true);
+            animator.SetBool(moveStateHash, false);
+            animator.SetBool(chaseStateHash, false);
+        }
+    }
     private void Death()
     {
         isDead = true; // Do once
+        
         player.GetComponent<EnemyDestroyedCounter>().AddToCounter();
-        Instantiate(deathEffect, transform.position, Quaternion.identity);
-        ChanceToSpawnPotion();
         Debug.Log($"{gameObject.name} was defeated");
         // Play animation and sound
+        animator.SetTrigger(deathStateHash);
+        
+        Invoke(nameof(DestroyEnemy), 3.0f);
+    }
+
+    private void DestroyEnemy()
+    {
+        Instantiate(deathEffect, transform.position, Quaternion.identity);
+        ChanceToSpawnPotion();
         gameObject.SetActive(false); // Remove
         this.enabled = false;
     }
@@ -160,10 +218,13 @@ public class Enemy : MonoBehaviour, IDamageable
         currentTarget = GetRandomPatrolPoint();
         agent.SetDestination(currentTarget);
         Debug.Log($"{gameObject.name} is moving {currentTarget}");
+        // Animation -------------------
+        animator.SetBool(moveStateHash, true);
     }
 
     private Vector3 GetRandomPatrolPoint()
     {
+        isChasing = false; //--------------------------Animation here ??
         Vector3 tryDestination = transform.position + Random.insideUnitSphere * patrolRange;
         return NavMesh.SamplePosition(tryDestination, out var hit, 1.0f, NavMesh.AllAreas) 
             ? hit.position : transform.position;
@@ -172,6 +233,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void ChaseTarget()
     {
         agent.SetDestination(player.transform.position);
+        isChasing = true;
     }
 
     private bool IsPlayerInSight()
@@ -188,6 +250,7 @@ public class Enemy : MonoBehaviour, IDamageable
             if (hitActor.GetComponent<IDamageable>() != null && hitActor.gameObject != gameObject)
             {
                 hitActor.GetComponent<IDamageable>().Damage(gameObject,damage);
+                animator.SetTrigger(attackStateHash);
             }
         }
         Invoke(nameof(ResetAttack), attackRate);
