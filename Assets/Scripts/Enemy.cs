@@ -20,8 +20,12 @@ public class Enemy : MonoBehaviour, IDamageable
     public int potionSpawnChance;
     public LayerMask damageLayer;
     public GameObject potion;
+    
+    [Header("FX")]
     public GameObject deathEffect;
     public ParticleSystem hitEffect;
+    public AudioSource hitAudioSource;
+    public AudioSource deadAudioSource;
     
     [Header("Animation")]
     public Animator animator;
@@ -135,6 +139,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (isDead) return; // If is dead and takes damage, they trigger the hit animation
         if (instigator.GetComponent<Enemy>()) return;
         hitEffect.Play();
+        hitAudioSource.Play();
         health -= amount;
         Debug.Log($"{name} was damaged by: {amount}");
         animator.SetTrigger(hitStateHash);
@@ -149,30 +154,7 @@ public class Enemy : MonoBehaviour, IDamageable
         // Check if there is a valid patrol target before moving
         animator.SetBool(moveStateHash, false);
     }
-
-    private void UpdateMoveAnimation()
-    {
-        if (agent.velocity.magnitude < 0.1f)
-        {
-            if (isChasing)
-            {
-                animator.SetBool(chaseStateHash, true);
-                animator.SetBool(moveStateHash, false);
-            }
-            else
-            {
-                animator.SetBool(moveStateHash, true);
-                animator.SetBool(chaseStateHash, false);
-            }
-            
-        }
-        else
-        {
-            animator.SetBool(idleStateHash, true);
-            animator.SetBool(moveStateHash, false);
-            animator.SetBool(chaseStateHash, false);
-        }
-    }
+    
     private void Death()
     {
         isDead = true; // Do once
@@ -181,10 +163,10 @@ public class Enemy : MonoBehaviour, IDamageable
         Debug.Log($"{gameObject.name} was defeated");
         // Play animation and sound
         animator.SetTrigger(deathStateHash);
-        
+        deadAudioSource.Play();
         Invoke(nameof(DestroyEnemy), 3.0f);
     }
-
+    
     private void DestroyEnemy()
     {
         Instantiate(deathEffect, transform.position, Quaternion.identity);
