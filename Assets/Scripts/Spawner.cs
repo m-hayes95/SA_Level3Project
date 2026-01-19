@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
@@ -12,7 +13,7 @@ public class Spawner : MonoBehaviour
     public float allowSpawnPlayerDistance = 50.0f;
 
     public bool enemiesCanSpawn = true;
-
+    public GameObject safeSpawnPoint;
     private Vector3 randSpawnPoint;
     private Vector3 lastSpawnPoint;
     private Vector3 center;
@@ -56,9 +57,14 @@ public class Spawner : MonoBehaviour
         float randX = transform.position.x + Random.Range(-spawnRange, spawnRange);
         float randZ = transform.position.z + Random.Range(-spawnRange, spawnRange);
         randSpawnPoint = new Vector3(randX, 0, randZ);
-        return randSpawnPoint;
+        return CheckSpawnIsValid(randSpawnPoint) ? randSpawnPoint : safeSpawnPoint.transform.position;
     }
 
+    private bool CheckSpawnIsValid(Vector3 checkPosition)
+    {
+        NavMeshHit navHit;
+        return NavMesh.SamplePosition(checkPosition, out navHit, 1.0f, NavMesh.AllAreas);
+    }
     private IEnumerator SpawnNextObject()
     {
         isSpawning = true;

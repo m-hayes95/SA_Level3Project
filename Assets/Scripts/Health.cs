@@ -15,6 +15,7 @@ public class Health : MonoBehaviour, IDamageable
     private const string ISDEAD = "IsDead";
     private const string  HIT = "Hit";
     public AudioSource hitSound;
+    public AudioSource healSound;
     [SerializeField] private float hp;
     
     private void Start()
@@ -36,6 +37,7 @@ public class Health : MonoBehaviour, IDamageable
     {
         hp += amount;
         OnHealthChanged.Invoke();
+        healSound.Play();
         if (hp > maxHealth)
         {
             hp = maxHealth;
