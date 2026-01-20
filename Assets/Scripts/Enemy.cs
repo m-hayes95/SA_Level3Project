@@ -47,6 +47,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool canAttack = true;
     private bool isChasing = false;
     private bool isDead = false;
+    private Rigidbody rb;
+    private Collider collider;
 
     private enum EnemyStateMachine
     {
@@ -62,6 +64,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        collider = GetComponent<Collider>();
+        rb = GetComponent<Rigidbody>();
     }
     
     private void Start()
@@ -158,7 +162,9 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Death()
     {
         isDead = true; // Do once
-        
+        // Turn off collisions when dead
+        collider.enabled = false;
+        rb.isKinematic = true;
         player.GetComponent<EnemyDestroyedCounter>().AddToCounter();
         Debug.Log($"{gameObject.name} was defeated");
         // Play animation and sound

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -22,7 +23,7 @@ public class Player : MonoBehaviour
     8. Upgrade Attack to Combo 0
     9. Refactor 0
     **/
-    
+    [Header("Input")]
     public InputActionAsset inputActionAsset;
 
     private InputAction moveAction;
@@ -31,26 +32,29 @@ public class Player : MonoBehaviour
     private InputAction attackAction;
     private InputAction throwBombAction;
     
-    private Rigidbody rigidbody;
     private Vector2 moveInput;
+    private CharacterController playerController;
 
     public UnityEvent OnAttack;
     public UnityEvent OnInteract;
     
-    // Movement
+    [Header("Movement")]
     [SerializeField] private int dashCount = 0; 
     
     public float moveSpeed;
     public float rotateSpeed;
     public float dashPower;
     public float dashCooldown = 5;
+    public float dashTime = 1.0f;
     public int dashes = 2;
+    public bool isDashing = false;
     public ParticleSystem dashEffect;
     private const string ISRUNNING = "IsRunning";
     private bool canInput = true;
+    
     public AudioSource dashSound;
     
-    // Bomb Attack
+    [Header("Bomb Settings")]
     public Animator  animator;
     public GameObject bombPrefab;
     public Transform bombSpawn;
@@ -61,11 +65,13 @@ public class Player : MonoBehaviour
     private bool isHoldingBomb = false;
     private const string ISHOLDINGBOMB = "IsHolding";
     private const string THROW = "Throw";
+    private readonly int dashStateHash =  Animator.StringToHash("Dash");
     
-    // Animation
+    [Header("Animation")]
+    public float animationTransitionTime;
     private float startAnimLayerMask;
     private float throwAnimLayerMask;
-    public float moveTowardsTime;
+    
     
     
     private void OnEnable()
@@ -86,7 +92,7 @@ public class Player : MonoBehaviour
         attackAction = inputActionAsset.FindAction("Attack");
         throwBombAction = inputActionAsset.FindAction("ThrowBomb");
         
-        rigidbody = GetComponent<Rigidbody>();
+        playerController = GetComponent<CharacterController>();
     }
 
     private void Start()
@@ -98,7 +104,14 @@ public class Player : MonoBehaviour
     {
         if (!canInput) return;
         
-        moveInput = moveAction.ReadValue<Vector2>();
+        
+        
+        Move();
+        
+        if (jumpAction.WasPressedThisFrame() && dashCount < dashes && !isDashing)
+        { 
+            StartCoroutine(Dash());
+        }
         
         if (throwBombAction.WasPressedThisFrame() )
         {
@@ -123,23 +136,12 @@ public class Player : MonoBehaviour
         }
     }
     
-    private void FixedUpdate()
-    {
-        if (!canInput) return;
-        
-        Move();
-        
-        if (jumpAction.WasPressedThisFrame() && dashCount < dashes)
-        { 
-            Dash();
-        }
-    }
-    
     private void Move()
     {
+        moveInput = moveAction.ReadValue<Vector2>();
         Vector3 moveDir =  new Vector3(moveInput.x, 0, moveInput.y);
-        rigidbody.MovePosition(rigidbody.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
-
+        moveDir *= moveSpeed * Time.deltaTime;
+        playerController.SimpleMove(moveDir);
         if (moveDir != Vector3.zero)
         {
             transform.forward = Vector3.Slerp(transform.forward, moveDir, rotateSpeed * Time.fixedDeltaTime);
@@ -151,29 +153,29 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Dash()
+    private IEnumerator Dash()
     {
-        // Make sure to adjust Rigidbody Linear Damping to prevent over sliding (3f)
-        
+        isDashing = true;
         dashCount++;
-        rigidbody.AddForceAtPosition(rigidbody.transform.forward * dashPower, rigidbody.position, ForceMode.Force);
+        Vector3 dashDir = transform.forward;
+        float timeElapsed = 0;
         dashSound.Play();
-        
         dashEffect.Play();
-        
+        animator.SetTrigger(dashStateHash);
+        StartCoroutine(TransitionAnimationLayers(1, 1f, 1f));
+        while (timeElapsed < dashTime)
+        {
+            playerController.SimpleMove(dashDir * (dashPower * Time.deltaTime));
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        StartCoroutine(TransitionAnimationLayers(1, 0f, .5f));
         if (dashCount == dashes)
         {
-            Invoke(nameof(ResetDash), dashCooldown); 
-            // Otherwise will make dashes reset earlier depending on the frame,
-            // but now has the issue of needing to hit 3 first
+            yield return new WaitForSeconds(dashCooldown);
+            dashCount = 0; 
         }
-        
-    }
-
-    private void ResetDash()
-    {
-        Debug.Log("Dash cooldown reset");
-        dashCount = 0;
+        isDashing = false;
     }
     
     private IEnumerator TransitionAnimationLayers(int animationLayer, float targetAnimWeight, float transitionTime)
@@ -186,7 +188,7 @@ public class Player : MonoBehaviour
         {
             float currentLayerWeight = animator.GetLayerWeight(animationLayer);
             float newLayerWeight = 
-                Mathf.MoveTowards(currentLayerWeight, targetAnimWeight, Time.deltaTime * moveTowardsTime);
+                Mathf.MoveTowards(currentLayerWeight, targetAnimWeight, Time.deltaTime * animationTransitionTime);
             animator.SetLayerWeight(animationLayer, newLayerWeight);
             Debug.Log($"Biggie Smalls {newLayerWeight}");
             yield return null;

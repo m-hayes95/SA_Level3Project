@@ -5270,8 +5270,7 @@ GameObject:
   - component: {fileID: 677496877404781613}
   - component: {fileID: 2807813580966672729}
   - component: {fileID: 3095030371700856094}
-  - component: {fileID: 28926883321591901}
-  - component: {fileID: 4522997517458321177}
+  - component: {fileID: 4427400422396609781}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -5388,20 +5387,23 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   dashCount: 0
-  moveSpeed: 10
+  moveSpeed: 12
   rotateSpeed: 10
-  dashPower: 1000
+  dashPower: 22
   dashCooldown: 5
+  dashTime: 0.5
   dashes: 3
+  isDashing: 0
   dashEffect: {fileID: 8958163264937282045}
   dashSound: {fileID: 8574933637794767884}
+  groundedPlayer: 0
   animator: {fileID: 4562735597408711356}
   bombPrefab: {fileID: 32018969420822150, guid: cc6f883a183ef9d4eb6be621ca1376a9, type: 3}
   bombSpawn: {fileID: 1564293621705934487}
   spawnRate: 4
   throwStrength: 10
   bombFriction: 1.3
-  moveTowardsTime: 15
+  animationTransitionTime: 15
 --- !u!114 &8338610600779732856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5471,8 +5473,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70ff976e9163dcd4fbd59489ca22fba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!136 &28926883321591901
-CapsuleCollider:
+--- !u!143 &4427400422396609781
+CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5486,41 +5488,16 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
+  serializedVersion: 3
   m_Height: 2
-  m_Direction: 1
+  m_Radius: 0.51
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &4522997517458321177
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318683144144060093}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 3
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!1 &7255368169152215493
 GameObject:
   m_ObjectHideFlags: 0
