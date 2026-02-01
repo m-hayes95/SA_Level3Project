@@ -66,6 +66,7 @@ public class Player : MonoBehaviour
     private const string ISHOLDINGBOMB = "IsHolding";
     private const string THROW = "Throw";
     private readonly int dashStateHash =  Animator.StringToHash("Dash");
+    public UnityEvent OnDashEvent;
     
     [Header("Animation")]
     public float animationTransitionTime;
@@ -140,7 +141,7 @@ public class Player : MonoBehaviour
     {
         moveInput = moveAction.ReadValue<Vector2>();
         Vector3 moveDir =  new Vector3(moveInput.x, 0, moveInput.y);
-        moveDir *= moveSpeed * Time.deltaTime;
+        moveDir *= moveSpeed;
         playerController.SimpleMove(moveDir);
         if (moveDir != Vector3.zero)
         {
@@ -160,12 +161,12 @@ public class Player : MonoBehaviour
         Vector3 dashDir = transform.forward;
         float timeElapsed = 0;
         dashSound.Play();
-        dashEffect.Play();
+        OnDashEvent?.Invoke();
         animator.SetTrigger(dashStateHash);
         StartCoroutine(TransitionAnimationLayers(1, 1f, 1f));
         while (timeElapsed < dashTime)
         {
-            playerController.SimpleMove(dashDir * (dashPower * Time.deltaTime));
+            playerController.SimpleMove(dashDir * dashPower);
             timeElapsed += Time.deltaTime;
             yield return null;
         }
