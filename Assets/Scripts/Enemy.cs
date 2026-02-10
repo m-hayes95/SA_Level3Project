@@ -1,25 +1,24 @@
 using System;
 using System.Collections;
-using System.Numerics;
 using Interfaces;
 using UnityEngine;
 using UnityEngine.AI;
-using Quaternion = UnityEngine.Quaternion;
-using Random = UnityEngine.Random;
+using UnityEngine.Events;
 using Vector3 = UnityEngine.Vector3;
 
-public class Enemy : MonoBehaviour, IDamageable
+public class Enemy : StateMachine, IDamageable
 {
     [Range(1f, 100f)]public float maxHealth;
-    [Range(1f, 5f)] public float acceptanceRadius;
     [Range(0f, 3f)] public float attackRadius;
     [Range(1f, 20f)] public float sightRange;
     [Range(1f, 100f)] public float damage;
     [Range(0f, 5f)] public float attackRate;
+    [Range(0f,5f)] public float waitTimer = 2f;
     [Tooltip("Chance to spawn potions after destroyed (0 = always spawn, 5 = 1/6 chance)"),Range(0f, 5f)] 
     public int potionSpawnChance;
     public LayerMask damageLayer;
     public GameObject potion;
+    public UnityEvent OnEnemyDeath;
     
     [Header("FX")]
     public GameObject deathEffect;
@@ -30,112 +29,68 @@ public class Enemy : MonoBehaviour, IDamageable
     [Header("Animation")]
     public Animator animator;
     
-    private readonly int idleStateHash =  Animator.StringToHash("IsIdle");
-    private readonly int moveStateHash =  Animator.StringToHash("IsMoving");
-    private readonly int chaseStateHash =  Animator.StringToHash("IsChasing");
-    private readonly int deathStateHash =  Animator.StringToHash("Dead");
-    private readonly int attackStateHash =  Animator.StringToHash("Attack");
-    private readonly int hitStateHash =  Animator.StringToHash("Hit");
+    public readonly int idleStateHash =  Animator.StringToHash("IsIdle");
+    public readonly int moveStateHash =  Animator.StringToHash("IsMoving");
+    public readonly int chaseStateHash =  Animator.StringToHash("IsChasing");
+    public readonly int waitStateHash =  Animator.StringToHash("IsWaiting");
+    public readonly int deathStateHash =  Animator.StringToHash("Dead");
+    public readonly int attackStateHash =  Animator.StringToHash("Attack");
+    public readonly int hitStateHash =  Animator.StringToHash("Hit");
     
     
     [SerializeField] private float health;
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
     private Vector3 destination;
-    private float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
-    private Vector3 currentTarget;
-    private Player player;
-    private bool canAttack = true;
-    private bool isChasing = false;
-    private bool isDead = false;
+    public float patrolRange = 10.0f; // recommended by unity as max value for range finding random point on nav mesh
+    public Vector3 currentTarget;
+    public Player player;
+    public bool canAttack = true;
+    public bool isChasing = false;
+    public bool isPatroling = false;
+    public bool isWaiting = false;
+    public bool isAttacking = false;
+    public bool isDead = false;
     private Rigidbody rb;
     private Collider collider;
 
-    private enum EnemyStateMachine
-    {
-        Idle,
-        Patrol,
-        Wait,
-        Chase,
-        Attack,
-        Destroyed
-    };
-    [SerializeField]private EnemyStateMachine sM;
+    // State variables
+    public Patrol patrolState {  get; private set; }  
+    public Chase chaseState {  get; private set; }  
+    public Wait waitState {  get; private set; }  
+    public Attack attackState {  get; private set; }  
+    public Dead deadState {  get; private set; }  
+    
     
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
+
+        // States do not inherit from monobehaviour so we need to set up a new instance of each state and pass in the this class for context
+        patrolState = new Patrol(this);
+        chaseState = new Chase(this);
+        waitState = new Wait(this);
+        attackState = new Attack(this);
+        deadState = new Dead(this);
     }
     
     private void Start()
     {
         health = maxHealth;
-        UpdatePatrolTarget();
-        sM = EnemyStateMachine.Patrol;
+     
         player = (Player)FindFirstObjectByType(typeof(Player));
+        // Enter the first state
+        InitializeState(patrolState);
+        //StartCoroutine(currentState.Task()); 
     }
 
     private void Update()
     {
         //UpdateMoveAnimation();
-        
-        Debug.Log($"Is player in sight {IsPlayerInSight()}");
-        
-        switch (sM)
-        {
-            case EnemyStateMachine.Idle:
-                Idle();
-                break;
-            
-            case EnemyStateMachine.Patrol:
-                
-                if (IsPlayerInSight())
-                {
-                    sM = EnemyStateMachine.Chase;
-                }
-                
-                Patrol();
-                
-                break;
-            case EnemyStateMachine.Chase:
-                
-                if (!IsPlayerInSight())
-                {
-                    sM = EnemyStateMachine.Wait;
-                }
-
-                if (Vector3.Distance(transform.position, player.transform.position) <= attackRadius)
-                {
-                    sM = EnemyStateMachine.Attack;
-                }
-                
-                ChaseTarget();
-                
-                break;
-            case EnemyStateMachine.Wait:
-                
-                Wait();
-                sM = EnemyStateMachine.Patrol;
-                
-                break;
-            
-            case EnemyStateMachine.Attack:
-                // need to improve this as atm the enemy will spam switch states whilst attacking
-                if(canAttack)
-                    Attack();
-                sM = EnemyStateMachine.Wait; 
-                break;
-            
-            case EnemyStateMachine.Destroyed:
-                if (!isDead)
-                    Death();
-                break;
-            
-            default:
-                break;
-            
-        }
+        // Call the current states update method
+        currentState.Update();
+        Debug.Log($"{this} current state = {currentState}");
     }
 
     public void Damage(GameObject instigator,float amount)
@@ -149,106 +104,29 @@ public class Enemy : MonoBehaviour, IDamageable
         animator.SetTrigger(hitStateHash);
         if (health <= 0)
         {
-            sM = EnemyStateMachine.Destroyed; 
+            ChangeState(deadState);
         }
     }
 
-    private void Idle()
-    {
-        // Check if there is a valid patrol target before moving
-        animator.SetBool(moveStateHash, false);
-    }
-    
-    private void Death()
-    {
-        isDead = true; // Do once
-        // Turn off collisions when dead
-        collider.enabled = false;
-        rb.isKinematic = true;
-        player.GetComponent<EnemyDestroyedCounter>().AddToCounter();
-        Debug.Log($"{gameObject.name} was defeated");
-        // Play animation and sound
-        animator.SetTrigger(deathStateHash);
-        deadAudioSource.Play();
-        Invoke(nameof(DestroyEnemy), 3.0f);
-    }
-    
-    private void DestroyEnemy()
-    {
-        Instantiate(deathEffect, transform.position, Quaternion.identity);
-        ChanceToSpawnPotion();
-        gameObject.SetActive(false); // Remove
-        this.enabled = false;
-    }
-
-    private void ChanceToSpawnPotion()
-    {
-        int rand = Random.Range(0, potionSpawnChance);
-        if (rand == 0)
-        {
-            Instantiate(potion, transform.position, transform.rotation);
-        }
-    }
-
-    private void Patrol()
-    {
-        if (Vector3.Distance(transform.position, currentTarget) <= acceptanceRadius)
-            UpdatePatrolTarget();
-    }
-
-    private void Wait()
-    {
-        UpdatePatrolTarget(); // when switching to patrol again the target is not updated as we are not at the target point
-    }
-
-    private void UpdatePatrolTarget()
-    {
-        currentTarget = GetRandomPatrolPoint();
-        agent.SetDestination(currentTarget);
-        Debug.Log($"{gameObject.name} is moving {currentTarget}");
-        // Animation -------------------
-        animator.SetBool(moveStateHash, true);
-    }
-
-    private Vector3 GetRandomPatrolPoint()
-    {
-        isChasing = false; //--------------------------Animation here ??
-        Vector3 tryDestination = transform.position + Random.insideUnitSphere * patrolRange;
-        return NavMesh.SamplePosition(tryDestination, out var hit, 1.0f, NavMesh.AllAreas) 
-            ? hit.position : transform.position;
-    }
-
-    private void ChaseTarget()
-    {
-        agent.SetDestination(player.transform.position);
-        isChasing = true;
-    }
-
-    private bool IsPlayerInSight()
+    public bool IsPlayerInSight()
     {
         return Vector3.Distance(transform.position, player.transform.position) <= sightRange;
     }
-
-    private void Attack()
+    
+    // If we want to add any trigger event states
+    private void OnTriggerEnter(Collider other)
     {
-        canAttack = false;
-        Collider[] hitActors = Physics.OverlapSphere(transform.position, attackRadius, damageLayer);
-        foreach (Collider hitActor in hitActors)
-        {
-            if (hitActor.GetComponent<IDamageable>() != null && hitActor.gameObject != gameObject)
-            {
-                hitActor.GetComponent<IDamageable>().Damage(gameObject,damage);
-                animator.SetTrigger(attackStateHash);
-            }
-        }
-        Invoke(nameof(ResetAttack), attackRate);
+        Debug.Log($"enemy collided with : {other.gameObject}");
+        currentState.OnTriggerEnter(other);
     }
-
-    private void ResetAttack()
+    private void OnTriggerExit(Collider other)
     {
-        canAttack = true;
+        currentState.OnTriggerExit(other);
     }
-
+    private void OnTriggerStay(Collider other)
+    {
+        currentState.OnTriggerStay(other);
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
