@@ -36,6 +36,7 @@ public class Enemy : StateMachine, IDamageable
     public readonly int deathStateHash =  Animator.StringToHash("Dead");
     public readonly int attackStateHash =  Animator.StringToHash("Attack");
     public readonly int hitStateHash =  Animator.StringToHash("Hit");
+    public readonly int testHash = Animator.StringToHash("Victory");
     
     
     [SerializeField] private float health;
@@ -59,6 +60,7 @@ public class Enemy : StateMachine, IDamageable
     public Wait waitState {  get; private set; }  
     public Attack attackState {  get; private set; }  
     public Dead deadState {  get; private set; }  
+    public TestState testState { get; private set; }
     
     
     private void Awake()
@@ -73,6 +75,7 @@ public class Enemy : StateMachine, IDamageable
         waitState = new Wait(this);
         attackState = new Attack(this);
         deadState = new Dead(this);
+        testState = new TestState(this, animator, agent);
     }
     
     private void Start()
@@ -81,7 +84,7 @@ public class Enemy : StateMachine, IDamageable
      
         player = (Player)FindFirstObjectByType(typeof(Player));
         // Enter the first state
-        InitializeState(patrolState);
+        InitializeState(testState);
         //StartCoroutine(currentState.Task()); 
     }
 
